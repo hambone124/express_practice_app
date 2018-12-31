@@ -1,37 +1,66 @@
-const updateTime = 1000;
-const div = document.getElementById("direction");
+const updateTime = 50;
+const statusElement = document.getElementById("status");
+const scoreElement = document.getElementById("score");
+const highScoreElement = document.getElementById("highScore");
 const canvas = document.getElementById("snakeCanvas");
 canvas.width = "500";
 canvas.height = "500";
 const ctx = canvas.getContext("2d");
-let snakeBody = [
+let tick;
+let score = 0;
+let highScore = 0;
+const initSnake = [
   { x: 10, y: 10 },
   { x: 10, y: 20 },
   { x: 10, y: 30 },
   { x: 10, y: 40 }
 ];
+let snakeBody = Array.from(initSnake);
 let currentDirection = "right";
+let moveLock = false;
+let isFoodPresent = false;
+let foodCoordinate;
+let gameOver = false;
 
 document.addEventListener("keypress", e => {
-  switch (e.key) {
-    case "w":
-      if (currentDirection !== "down") 
-        currentDirection = "up";
-      break;
-    case "a":
-      if (currentDirection !== "right") 
-        currentDirection = "left";
-      break;
-    case "s":
-      if (currentDirection !== "up") 
-        currentDirection = "down";
-      break;
-    case "d":
-      if (currentDirection !== "left") 
-        currentDirection = "right";
-      break;
+  if (!moveLock) {
+    switch (e.key) {
+      case "w":
+        if (currentDirection !== "down") 
+          currentDirection = "up";
+        break;
+      case "a":
+        if (currentDirection !== "right") 
+          currentDirection = "left";
+        break;
+      case "s":
+        if (currentDirection !== "up") 
+          currentDirection = "down";
+        break;
+      case "d":
+        if (currentDirection !== "left") 
+          currentDirection = "right";
+        break;        
+    }
+    moveLock = true;
   }
+  if (e.key === "r")
+    restartGame();
 });
+
+function restartGame() {
+  if (gameOver) {
+    if (score > highScore)
+      highScore = score;
+    highScoreElement.innerHTML = highScore;
+    statusElement.innerHTML = "Use WASD to move";
+    gameOver = false;
+    score = 0;
+    snakeBody = Array.from(initSnake);
+    currentDirection = "right";
+    start();
+  }
+}
 
 function clearCanvas() {
   ctx.fillStyle = "black";
@@ -51,6 +80,15 @@ function drawSnakeBody() {
   });  
 }
 
+function endGame(snakeHead) {
+  for (let i = 3; i < snakeBody.length; i++) {
+    if (snakeBody[i].x === snakeHead.x && snakeBody[i].y === snakeHead.y) {
+      gameOver = true;
+      statusElement.innerHTML = "Game Over. Press R to restart.";
+    }
+  }
+}
+
 function moveSnakeBody() {
   let newSnakeHead = Object.assign({}, snakeBody[0]);
   switch (currentDirection) {
@@ -68,6 +106,8 @@ function moveSnakeBody() {
       break;
   }
   
+  endGame(newSnakeHead);
+  
   if (newSnakeHead.x > canvas.width) 
     newSnakeHead.x = 0;
   else if (newSnakeHead.x < 0) 
@@ -78,21 +118,50 @@ function moveSnakeBody() {
     newSnakeHead.y = canvas.height;
   
   snakeBody.unshift(newSnakeHead);
-  snakeBody.pop();
+  if (newSnakeHead.x === foodCoordinate.x && newSnakeHead.y === foodCoordinate.y) {
+    isFoodPresent = false;
+    score++;
+  }
+  else
+    snakeBody.pop();
+}
+
+function randomPoint() {
+  let point = {}
+  let randomX = Math.floor((Math.floor(Math.random() * canvas.width) / 10)) * 10;
+  let randomY = Math.floor((Math.floor(Math.random() * canvas.height) / 10)) * 10;
+  return { x: randomX, y: randomY };
+}
+
+function drawFood(coordinate) {
+  ctx.strokeStyle = "red";
+  ctx.fillStyle = "yellow";
+  ctx.strokeRect(coordinate.x, coordinate.y, 10, 10);
+  ctx.fillRect(coordinate.x, coordinate.y, 10, 10);
+}
+
+function updateFood() {
+  if (!isFoodPresent) {
+    foodCoordinate = randomPoint();
+    isFoodPresent = true;
+  }
+  drawFood(foodCoordinate);
 }
 
 function start() {
   clearCanvas();
   drawSnakeBody();
-  setInterval(() => {
-    div.innerHTML = currentDirection;
+  tick = setInterval(() => {
+    scoreElement.innerHTML = score;
     clearCanvas();
+    updateFood();
     moveSnakeBody();
     drawSnakeBody();
+    moveLock = false;
+    if (gameOver) {
+      clearInterval(tick);
+    }
   }, updateTime);
 }
 
 start();
-
-
-
