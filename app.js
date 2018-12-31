@@ -3,6 +3,13 @@ const express = require("express"),
       os = require("os"),
       ip = os.networkInterfaces().eth0[0].address;
 
+function appendLog(event) {
+  const dateString = new Date().toLocaleString("en-US", {
+    timeZone: "America/New_York"
+  });
+  console.log(`${dateString}: ${event}`);
+}
+
 app.set("view engine", "ejs");
 app.use(express.static("public"));
 app.use("/paper", express.static("node_modules/paper/dist"));
@@ -25,5 +32,5 @@ app.get("/gameoflife", (req, res) => {
 });
 
 app.listen(3000, ip, () => {
-	console.log(`testapp launched at ${ip}`);
+	appendLog(`testapp launched at ${ip}`);
 });
