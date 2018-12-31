@@ -1,4 +1,4 @@
-const updateTime = 100;
+const updateTime = 1000;
 const div = document.getElementById("direction");
 const canvas = document.getElementById("snakeCanvas");
 canvas.width = "500";
@@ -11,6 +11,27 @@ let snakeBody = [
   { x: 10, y: 40 }
 ];
 let currentDirection = "right";
+
+document.addEventListener("keypress", e => {
+  switch (e.key) {
+    case "w":
+      if (currentDirection !== "down") 
+        currentDirection = "up";
+      break;
+    case "a":
+      if (currentDirection !== "right") 
+        currentDirection = "left";
+      break;
+    case "s":
+      if (currentDirection !== "up") 
+        currentDirection = "down";
+      break;
+    case "d":
+      if (currentDirection !== "left") 
+        currentDirection = "right";
+      break;
+  }
+});
 
 function clearCanvas() {
   ctx.fillStyle = "black";
@@ -46,6 +67,16 @@ function moveSnakeBody() {
       newSnakeHead.x -= 10;
       break;
   }
+  
+  if (newSnakeHead.x > canvas.width) 
+    newSnakeHead.x = 0;
+  else if (newSnakeHead.x < 0) 
+    newSnakeHead.x = canvas.width;
+  else if (newSnakeHead.y > canvas.height) 
+    newSnakeHead.y = 0;
+  else if (newSnakeHead.y < 0) 
+    newSnakeHead.y = canvas.height;
+  
   snakeBody.unshift(newSnakeHead);
   snakeBody.pop();
 }
