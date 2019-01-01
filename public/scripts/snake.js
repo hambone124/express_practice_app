@@ -22,25 +22,19 @@ let isFoodPresent = false;
 let foodCoordinate;
 let gameOver = false;
 
-document.addEventListener("keypress", e => {
+document.addEventListener("keydown", e => {
   if (!moveLock) {
-    switch (e.key) {
-      case "w":
-        if (currentDirection !== "down") 
-          currentDirection = "up";
-        break;
-      case "a":
-        if (currentDirection !== "right") 
-          currentDirection = "left";
-        break;
-      case "s":
-        if (currentDirection !== "up") 
-          currentDirection = "down";
-        break;
-      case "d":
-        if (currentDirection !== "left") 
-          currentDirection = "right";
-        break;        
+    if ((e.key === "ArrowUp" || e.key === "w") && currentDirection !== "down") { 
+      currentDirection = "up";
+    }
+    else if ((e.key === "ArrowLeft" || e.key === "a") && currentDirection !== "right") { 
+      currentDirection = "left";
+    }
+    else if ((e.key === "ArrowDown" || e.key === "s") && currentDirection !== "up") { 
+      currentDirection = "down";
+    }
+    else if ((e.key === "ArrowRight" || e.key === "d") && currentDirection !== "left") { 
+      currentDirection = "right";
     }
     moveLock = true;
   }
@@ -50,10 +44,7 @@ document.addEventListener("keypress", e => {
 
 function restartGame() {
   if (gameOver) {
-    if (score > highScore)
-      highScore = score;
-    highScoreElement.innerHTML = highScore;
-    statusElement.innerHTML = "Use WASD to move";
+    statusElement.innerHTML = "Use WASD or arrow keys to move";
     gameOver = false;
     score = 0;
     snakeBody = Array.from(initSnake);
@@ -80,11 +71,15 @@ function drawSnakeBody() {
   });  
 }
 
-function endGame(snakeHead) {
+function checkEndGame() {
+  let snakeHead = snakeBody[0];
   for (let i = 3; i < snakeBody.length; i++) {
     if (snakeBody[i].x === snakeHead.x && snakeBody[i].y === snakeHead.y) {
       gameOver = true;
       statusElement.innerHTML = "Game Over. Press R to restart.";
+      if (score > highScore)
+        highScore = score;
+      highScoreElement.innerHTML = highScore;
     }
   }
 }
@@ -105,8 +100,6 @@ function moveSnakeBody() {
       newSnakeHead.x -= 10;
       break;
   }
-  
-  endGame(newSnakeHead);
   
   if (newSnakeHead.x > canvas.width) 
     newSnakeHead.x = 0;
@@ -157,6 +150,7 @@ function start() {
     updateFood();
     moveSnakeBody();
     drawSnakeBody();
+    checkEndGame(snakeBody[0]);
     moveLock = false;
     if (gameOver) {
       clearInterval(tick);
