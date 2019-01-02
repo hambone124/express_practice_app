@@ -28,7 +28,7 @@ app.get("/snake", (req, res) => {
 });
 
 app.get("/gameoflife", (req, res) => {
-  res.send("Coming soon!");
+  res.render("gameoflife");
 });
 
 app.listen(3000, ip, () => {

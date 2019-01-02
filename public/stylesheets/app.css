@@ -7,3 +7,21 @@ html, body, #buttonsCanvas {
 }
 #snakeCanvas {
 }
+.container {
+  margin: 0;
+  padding: 0;
+}
+.live {
+  background-color: black;
+}
+.dead {
+  background-color: white;
+}
+.cell {
+  margin: 0;
+  padding: 0;
+  border: solid 1px black;
+  display: inline-block;
+  height: 25px;
+  width: 25px;
+}
