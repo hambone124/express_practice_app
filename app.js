@@ -31,6 +31,10 @@ app.get("/gameoflife", (req, res) => {
   res.render("gameoflife");
 });
 
+app.get("/binaryclock", (req, res) => {
+  res.render("binaryclock");
+});
+
 app.listen(3000, ip, () => {
 	appendLog(`testapp launched at ${ip}`);
 });
