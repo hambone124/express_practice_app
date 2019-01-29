@@ -22,6 +22,14 @@ function convertToBinaryArray(num) {
   return binaryArray;
 }
 
+function convertToBinaryTimeArray(_timeArray) {
+  const binaryTimeArray = _timeArray.reduce((p, c) => {
+    const binaryArray = p.concat(convertToBinaryArray(c));
+    return binaryArray;
+  }, []);
+  return binaryTimeArray;
+}
+
 function getTimeStringArray() {
   const date = new Date();
   const arr = [date.getHours(), date.getMinutes(), date.getSeconds()];
@@ -37,8 +45,23 @@ function getTimeStringArray() {
   }, []);
 }
 
-function updateDisplay(_binaryTimeArray) {  
+function clearDisplay() {
   ctx.clearRect(0, 0, canvas.width, canvas.height);
+}
+
+function updateDigitalDisplay(_timeArray) {
+  let x = circleRadius;
+  const y = 5 * gridScale;
+  ctx.fillStyle = "white";
+  ctx.font = "20px Arial";
+  for (let i = 0; i < _timeArray.length; i++) {
+    if (i % 2 === 0 && i > 0) x += gridScale / 2;
+    x += gridScale;
+    ctx.fillText(_timeArray[i], x, y);
+  }
+} 
+
+function updateBinaryDisplay(_binaryTimeArray) {  
   let x = 0;
   let y = 0;
   for (var i = 0; i < _binaryTimeArray.length; i++) {
@@ -54,11 +77,10 @@ function updateDisplay(_binaryTimeArray) {
 
 function tick() {
   const timeArray = getTimeStringArray();
-  const binaryTimeArray = timeArray.reduce((p, c) => {
-    const binaryArray = p.concat(convertToBinaryArray(c));
-    return binaryArray;
-  }, []);
-  updateDisplay(binaryTimeArray);
+  const binaryTimeArray = convertToBinaryTimeArray(timeArray);
+  clearDisplay();
+  updateDigitalDisplay(timeArray);
+  updateBinaryDisplay(binaryTimeArray);
 }
 
 setInterval(() => tick(), 1000);
